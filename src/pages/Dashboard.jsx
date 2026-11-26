@@ -10,11 +10,13 @@ export default function Dashboard() {
   const [tasks, setTasks] = useState([])
   const [projects, setProjects] = useState([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
 
   useEffect(() => {
     Promise.all([api.getTasks(), api.getProjects()])
       .then(([taskData, projectData]) => { setTasks(taskData); setProjects(projectData) })
-      .finally(() => setLoading(false))
+      .catch(() => setError('Could not load dashboard data. Check that the API is running.'))
+    .finally(() => setLoading(false))
   }, [])
 
   const completed = tasks.filter((task) => task.status === 'Done').length
@@ -24,6 +26,7 @@ export default function Dashboard() {
   return (
     <div className="page-content">
       <SectionHeading eyebrow="THURSDAY, OCTOBER 15, 2026" title="Good morning, Dana ✨" description="Here's what's happening across your workspace today." action="New task" to="/tasks/new" />
+      {error && <div className="form-error">{error}</div>}
       <section className="welcome-banner">
         <div className="welcome-copy"><span className="banner-kicker"><span className="sparkle-dot">✦</span> YOUR WORKSPACE AT A GLANCE</span><h2>Make progress, <em>not just plans.</em></h2><p>A little progress each day adds up to big results. Let's make today count.</p><Link to="/tasks" className="banner-link">View all tasks <ArrowRight size={15} /></Link></div>
         <div className="banner-art" aria-hidden="true"><div className="art-orbit orbit-one" /><div className="art-orbit orbit-two" /><div className="art-card art-card-back" /><div className="art-card art-card-front"><CheckCircle2 size={25} /><span>Focus time</span><strong>02:45:18</strong><small>You're doing great!</small></div><div className="art-star star-one">✦</div><div className="art-star star-two">✳</div></div>
