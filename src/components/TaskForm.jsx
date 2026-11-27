@@ -7,6 +7,7 @@ const blankTask = { title: '', description: '', status: 'To do', priority: 'Medi
 export default function TaskForm({ initialValues, projects, onSubmit, submitLabel = 'Create task' }) {
   const [form, setForm] = useState({ ...blankTask, ...initialValues })
   const [error, setError] = useState('')
+  const [submitting, setSubmitting] = useState(false)
 
   function update(event) {
     setForm((current) => ({ ...current, [event.target.name]: event.target.value }))
@@ -23,7 +24,12 @@ export default function TaskForm({ initialValues, projects, onSubmit, submitLabe
       return
     }
     setError('')
-    await onSubmit(form)
+    setSubmitting(true)
+    try {
+      await onSubmit(form)
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   return (
@@ -45,7 +51,7 @@ export default function TaskForm({ initialValues, projects, onSubmit, submitLabe
         <div className="form-field full-field"><label htmlFor="dueDate">Due date <span>*</span></label><input id="dueDate" type="date" name="dueDate" value={form.dueDate} onChange={update} /></div>
       </div>
       {error && <div className="form-error" role="alert">{error}</div>}
-      <div className="form-actions"><Link to="/tasks" className="button button-ghost"><ArrowLeft size={16} />Cancel</Link><button className="button button-primary" type="submit"><Save size={16} />{submitLabel}</button></div>
+      <div className="form-actions"><Link to="/tasks" className="button button-ghost"><ArrowLeft size={16} />Cancel</Link><button className="button button-primary" type="submit" disabled={submitting}><Save size={16} />{submitting ? 'Saving…' : submitLabel}</button></div>
     </form>
   )
 }
